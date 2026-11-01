@@ -1,0 +1,5 @@
+flask>=3.0
+python-dotenv>=1.0
+sarvamai>=0.1.41
+# only needed to regenerate the sample documents with tools/make_samples.py
+pillow>=10.0

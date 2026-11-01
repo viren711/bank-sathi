@@ -1,0 +1,27 @@
+I am planning to make (hindi name of finance/banking)Sathi
+
+This is a project for elderly people as well as people who do not know english but need to do various banking operations. 
+
+The goal is to create a minimal UI that is easy to use, they can take pictures from camera or upload documents like passbook, application forms, FD, load, pension, etc. The site will have revolving header which will print all the 22 Indian Constitution lauguage in the own lauguage.
+
+You also need to build a help page in regional language that explains how website work. Also, it might not be possible to use the reginoal speech to text so I will add the regional text here, you will need to work accordingly.
+
+
+The person can take image and the upload, then it will be able to interact with it, ask questions in regional languae and get answers in form of audio. This will also be accompanied by the generated responce in the chat as well. 
+
+It will also be able to help in further steps.
+
+Add more features should also be integrated. You can have sections.की एक पर्ची है।
+इसमें सुनिता जी ने 1 लाख रुपये जमा किए हैं।
+पैसे 2 साल के लिए बैंक में रखे गए हैं।
+पैसे पूरे होने पर ब्याज के साथ पैसे वापस मिलेंगे।
+पैसे निकालने के
+
+
+
+
+IDEA
+CREATIVE
+FEATURES
+TECHINAL DEPTH
+DEPLOYMENT

@@ -1,0 +1,124 @@
+SARVAM AI APIs (from docs.sarvam.ai, read 2026-11-01)
+
+Base URL: https://api.sarvam.ai
+Auth header: api-subscription-key: <key>   (or Authorization: Bearer <key>)
+Auth failures return 403. Out of credits returns 402. Rate limit 429. Overload 503.
+SDKs: pip install -U sarvamai | npm install sarvamai@latest
+
+==========================================================================
+1. CHAT COMPLETION
+==========================================================================
+Endpoints: POST /v1/chat/completions, POST /v2/chat/completions (OpenAI-compatible)
+Python: client.chat.completions(...)  |  client.chat.completions_v2(...)
+Models:
+  sarvam-105b                 flagship, 128K context        Rs15 in / Rs60 out per 1M tokens
+  sarvam-105b-conversations   real-time/voice, 32K context  Rs15 in / Rs60 out per 1M tokens
+  V2 open-weight: glm5.3, glm5.3-flash, gemma4, deepseekv4.1-flash-1017
+  V2 beta: deepseekv4-pro, kimi-k3, mimo-v2.6-flash, mimo-v2.6-pro
+  sarvam-m is deprecated.
+Features: streaming, tool calling, structured output (json_schema), reasoning
+  (reasoning_effort; thinking on by default on V1; reasoning tokens count in max_tokens).
+Languages: 10 Indic languages plus English.
+Rate limit (pay as you go): 60 req/min for sarvam-105b, 50 req/min for V2 default models.
+
+==========================================================================
+2. SPEECH TO TEXT (STT)
+==========================================================================
+Endpoint: POST /speech-to-text            Python: client.speech_to_text.transcribe(...)
+Model: saaras:v4 (also saaras v3 in guides)
+Modes: transcribe (default), translate, verbatim, translit, codemix
+Variants: real-time REST, WebSocket streaming, batch (with diarization)
+Price: Rs0.49/min (Rs0.59/min with diarization), billed per second.
+Rate limit (PAYG): REST 60/min, WebSocket 20 concurrent, batch 20/min.
+
+==========================================================================
+3. SPEECH TO TEXT TRANSLATE
+==========================================================================
+Endpoint: POST /speech-to-text-translate
+Transcribes and translates audio in one call.
+
+==========================================================================
+4. TEXT TO SPEECH (TTS)
+==========================================================================
+Endpoint: POST /text-to-speech            Python: client.text_to_speech.convert(...)
+Models: bulbul:v4-flash (Rs1/1K chars), bulbul:v3 (Rs3/1K chars)
+Voices in 10 languages. Output is base64-encoded audio in "audios"; decode before saving.
+Variants: REST, HTTP streaming, WebSocket streaming.
+Rate limit (PAYG): 60 req/min, 60 concurrent WebSocket.
+
+==========================================================================
+5. INSTANT VOICE CLONING (beta)
+==========================================================================
+Endpoints: POST /voices/create (save a voice), POST /voices/clone (speak with voice_id)
+Needs the text_to_speech_voice_cloning capability on the subscription.
+Price: Rs2/1K chars. Rate limit (PAYG): 60 req/min.
+
+==========================================================================
+6. TEXT TRANSLATION
+==========================================================================
+Endpoint: POST /translate                 Python: client.text.translate(...)
+Model: Mayura. 22 Indic languages plus English. source_language_code="auto" detects source.
+Price: Rs2/1K chars. Rate limit (PAYG): 60 req/min.
+
+==========================================================================
+7. DOCUMENT TRANSLATION
+==========================================================================
+Endpoints: /translate/document/jobs (async: create job, upload, start, poll, download)
+Formats: PDF, Word, Excel, PowerPoint, HTML (layout and format preserved).
+Price: Rs5 per 1K billable chars per target language.
+
+==========================================================================
+8. TRANSLITERATION
+==========================================================================
+Endpoint: POST /transliterate
+Converts text between scripts within the same language. Price: Rs2/1K chars.
+
+==========================================================================
+9. LANGUAGE IDENTIFICATION
+==========================================================================
+Endpoint: POST /text-lid
+Detects the language of input text. Price: Rs0.35/1K chars.
+
+==========================================================================
+10. DOCUMENT INTELLIGENCE / DOCUMENT AI (Sarvam Vision)
+==========================================================================
+Async jobs. Operations: Parse/Digitization (Rs0.50/page), Extraction (Rs1/page),
+Split (page groups, ranges, markers, detected boundaries), Classify (labels with evidence).
+Use output_format="md" (not "markdown", which returns 400).
+
+==========================================================================
+11. DUBBING (beta)
+==========================================================================
+Async jobs. Rs40/min per target language (Rs80 with editor_flow: true).
+
+==========================================================================
+12. VOICE AGENTS (Samvaad)
+==========================================================================
+Platform to build, test and deploy AI calling agents on your own phone numbers
+(from Rs3/min). Docs: https://docs.sarvam.ai/voice-agents/overview
+
+==========================================================================
+OTHER PRODUCTS AND TOOLS
+==========================================================================
+Doc Agents, Content Studio, Cowork, Coding Agents (sarvam-code), MCP server,
+Agent Skills, self-hosted deployments, integrations (LangChain, LiveKit, Pipecat,
+Vapi, Twilio, Exotel, Vercel AI SDK, n8n).
+
+==========================================================================
+PRICING AND CREDITS
+==========================================================================
+Rs100 free credits for every verified user. Credits never expire. Top up on the
+dashboard Billing page. Plans: Pay as you go (free), Pro Rs9,999/mo, Growth Rs49,999/mo,
+Business Rs1,99,999/mo, Enterprise (custom). Prices exclude GST.
+
+==========================================================================
+DOC LINKS
+==========================================================================
+API intro:   https://docs.sarvam.ai/api-reference/introduction
+Auth:        https://docs.sarvam.ai/api-reference/authentication
+Quickstart:  https://docs.sarvam.ai/api/getting-started/quickstart
+Pricing:     https://docs.sarvam.ai/api/getting-started/pricing
+Models:      https://docs.sarvam.ai/api/getting-started/models
+Errors:      https://docs.sarvam.ai/api/getting-started/errors-troubleshooting
+Cookbook:    https://docs.sarvam.ai/api/cookbook
+Full index:  https://docs.sarvam.ai/llms.txt

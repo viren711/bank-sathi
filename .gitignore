@@ -1,0 +1,7 @@
+.env
+.venv/
+certs/
+__pycache__/
+*.pyc
+translation_cache.json
+.DS_Store

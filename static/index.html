@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1e3a8a">
+<title>बैंक साथी · Bank Sathi</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- icon sprite (Lucide-style stroke icons) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+  <symbol id="i-form" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="i-sms" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v4M12 14h.01"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 2 3 7h18z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3zM12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="bar">
+    <h1 class="brand">बैंक साथी<small>Bank Sathi</small></h1>
+    <label class="sr" for="lang">Language</label>
+    <select id="lang"></select>
+    <button class="sizebtn" id="sm" aria-label="Smaller letters">A-</button>
+    <button class="sizebtn" id="lg" aria-label="Bigger letters">A+</button>
+  </div>
+  <div class="ticker" id="ticker">
+    <div id="rev" aria-label="Languages"></div>
+    <button class="tpause" id="tpause" aria-label="Pause or play the moving languages"></button>
+  </div>
+</header>
+
+<nav aria-label="Pages"><div id="tabs" role="tablist"></div></nav>
+
+<main>
+  <!-- HOME -->
+  <section class="view on" id="home">
+    <p class="hello" data-i18n>Namaste! What do you need help with today?</p>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <!-- SCAN AND ASK -->
+  <section class="view" id="scan">
+    <div class="card">
+      <h2 data-i18n>Show your paper, then ask</h2>
+      <p class="lead" data-i18n>Take a photo of your passbook, form, FD, loan or pension paper. Then ask your question.</p>
+      <div class="row">
+        <label class="btn" for="cam" tabindex="0" id="camlabel"><svg class="i"><use href="#i-camera"/></svg><span data-i18n>Take a photo</span></label>
+        <label class="btn alt" for="up" tabindex="0" id="uplabel"><svg class="i"><use href="#i-upload"/></svg><span data-i18n>Upload a file</span></label>
+      </div>
+      <input id="cam" type="file" accept="image/*" capture="environment">
+      <input id="up" type="file" accept="image/png,image/jpeg,application/pdf">
+      <p class="hint" data-i18n>No paper with you? Try a sample:</p>
+      <div class="samples" id="samples"></div>
+      <img id="preview" class="thumb" alt="Your document">
+      <div class="status" id="docstate" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <div class="chips" id="docchips"></div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="field">
+        <textarea id="q" rows="2" data-i18n-ph placeholder="Type your question in your language" aria-label="Your question"></textarea>
+        <button class="mic" data-for="q" aria-label="Speak"></button>
+        <button class="btn" id="send"><svg class="i"><use href="#i-send"/></svg><span data-i18n>Ask</span></button>
+      </div>
+      <div class="micstate"></div>
+      <p class="hint" data-i18n>Answers are shown here and also read aloud.</p>
+    </div>
+  </section>
+
+  <!-- NEXT STEPS -->
+  <section class="view" id="steps">
+    <div class="card">
+      <h2 data-i18n>What should I do next?</h2>
+      <h3 class="label" data-i18n>1. Tell me your problem</h3>
+      <p class="hint" data-i18n>Type it, or press the microphone and speak.</p>
+      <div class="field">
+        <textarea id="issue" rows="3" data-i18n-ph placeholder="For example: my pension has not come this month" aria-label="Your problem"></textarea>
+        <button class="mic" data-for="issue" aria-label="Speak"></button>
+      </div>
+      <div class="micstate"></div>
+      <h3 class="label" data-i18n>2. Add a photo of your paper (optional)</h3>
+      <div class="row">
+        <label class="btn alt" for="cam2" tabindex="0" id="camlabel2"><svg class="i"><use href="#i-camera"/></svg><span data-i18n>Take a photo</span></label>
+        <label class="btn ghost" for="up2" tabindex="0" id="uplabel2"><svg class="i"><use href="#i-upload"/></svg><span data-i18n>Upload a file</span></label>
+      </div>
+      <input id="cam2" type="file" accept="image/*" capture="environment">
+      <input id="up2" type="file" accept="image/png,image/jpeg,application/pdf">
+      <img id="preview2" class="thumb" alt="Your document">
+      <div class="status" id="docstate2" aria-live="polite"></div>
+      <h3 class="label" data-i18n>3. Get help</h3>
+      <div class="row"><button class="btn" id="issuego"><svg class="i"><use href="#i-send"/></svg><span data-i18n>Tell me what to do</span></button></div>
+      <div class="chat" id="chat2" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <h3 data-i18n>Quick questions about your paper</h3>
+      <div class="row">
+        <button class="btn ghost" data-ask="Give me a simple numbered list of the next steps I should take with this document, including what to carry to the bank."><span data-i18n>Steps for this paper</span></button>
+        <button class="btn ghost" data-ask="Which parts of this form do I need to fill in or sign? Explain each field in simple words."><span data-i18n>Help me fill this form</span></button>
+        <button class="btn ghost" data-ask="Are there any dates, deadlines, charges or amounts in this document that I should be careful about?"><span data-i18n>Dates and charges to watch</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILL A FORM -->
+  <section class="view" id="form">
+    <div class="card">
+      <h2 data-i18n>Fill a form with help</h2>
+      <p class="lead" data-i18n>Choose a form. I will ask you one box at a time and explain it in simple words.</p>
+      <div id="formbody"></div>
+    </div>
+    <div class="card">
+      <h2 data-i18n>Have a different form or paper?</h2>
+      <p class="lead" data-i18n>Take a photo or upload it. Then ask me what to write in each box, or anything else about it.</p>
+      <div class="row">
+        <label class="btn" for="cam3" tabindex="0" id="camlabel3"><svg class="i"><use href="#i-camera"/></svg><span data-i18n>Take a photo</span></label>
+        <label class="btn alt" for="up3" tabindex="0" id="uplabel3"><svg class="i"><use href="#i-upload"/></svg><span data-i18n>Upload a file</span></label>
+      </div>
+      <input id="cam3" type="file" accept="image/*" capture="environment">
+      <input id="up3" type="file" accept="image/png,image/jpeg,application/pdf">
+      <p class="hint" data-i18n>No paper with you? Try a sample:</p>
+      <div class="samples" id="samples3"></div>
+      <img id="preview3" class="thumb" alt="Your document">
+      <div class="status" id="docstate3" aria-live="polite"></div>
+      <div class="chips" id="formchips"></div>
+      <div class="chat" id="chat4" aria-live="polite"></div>
+      <div class="field">
+        <textarea id="q4" rows="2" data-i18n-ph placeholder="Ask about this paper, in your language" aria-label="Your question"></textarea>
+        <button class="mic" data-for="q4" aria-label="Speak"></button>
+        <button class="btn" id="send4"><svg class="i"><use href="#i-send"/></svg><span data-i18n>Ask</span></button>
+      </div>
+      <div class="micstate"></div>
+    </div>
+  </section>
+
+  <!-- CHECK A MESSAGE -->
+  <section class="view" id="sms">
+    <div class="card">
+      <h2 data-i18n>Is this message real or a scam?</h2>
+      <p class="lead" data-i18n>Paste the SMS you received. I will tell you if it is a bank message or looks suspicious, and what to do next.</p>
+      <label class="label" for="smstext" data-i18n>The message</label>
+      <div class="field">
+        <textarea id="smstext" rows="4" data-i18n-ph placeholder="Paste the message here"></textarea>
+        <button class="mic" data-for="smstext" aria-label="Speak"></button>
+      </div>
+      <div class="micstate"></div>
+      <label class="label" for="smssender" data-i18n>Who sent it? (optional, like VM-SBIBNK or a phone number)</label>
+      <input type="text" id="smssender" autocomplete="off">
+      <div class="row"><button class="btn" id="smscheck"><svg class="i"><use href="#i-search"/></svg><span data-i18n>Check this message</span></button></div>
+      <p class="hint" data-i18n>Or try a sample message:</p>
+      <div class="chips" id="smssamples"></div>
+      <div id="smsresult" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- SCHEMES -->
+  <section class="view" id="schemes">
+    <div class="card">
+      <h2 data-i18n>Government schemes</h2>
+      <p class="lead" data-i18n>Pension, insurance, savings and loan schemes. Open any scheme to read more and ask your questions.</p>
+      <div class="chips" id="schemetags"></div>
+      <div id="schemelist"></div>
+      <p class="hint" data-i18n>Find more schemes you may qualify for:</p>
+      <div class="row"><a class="btn ghost small" href="https://www.myscheme.gov.in/" target="_blank" rel="noopener noreferrer"><svg class="i"><use href="#i-link"/></svg><span>myscheme.gov.in</span></a></div>
+      <p class="hint" data-i18n>Amounts, rates and rules change. Please confirm at your bank, post office or the official website before you apply.</p>
+    </div>
+  </section>
+
+  <!-- WORDS -->
+  <section class="view" id="words">
+    <div class="card">
+      <h2 data-i18n>What does this word mean?</h2>
+      <p class="lead" data-i18n>Type any banking word and get a simple explanation.</p>
+      <div class="chips" id="wordchips"></div>
+      <div class="field">
+        <input type="text" id="wordq" data-i18n-ph placeholder="For example: nominee" aria-label="Banking word" autocomplete="off">
+        <button class="mic" data-for="wordq" aria-label="Speak"></button>
+        <button class="btn" id="wordgo"><svg class="i"><use href="#i-search"/></svg><span data-i18n>Explain</span></button>
+      </div>
+      <div class="micstate"></div>
+      <div class="chat" id="chat3" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- STAY SAFE -->
+  <section class="view" id="safe">
+    <div class="card">
+      <h2 data-i18n>Stay safe from fraud</h2>
+      <div id="tips"></div>
+      <p class="hint" data-i18n>Lost money to fraud? Report it here, or call 1930:</p>
+      <div class="row"><a class="btn alt small" href="https://cybercrime.gov.in/" target="_blank" rel="noopener noreferrer"><svg class="i"><use href="#i-link"/></svg><span>cybercrime.gov.in</span></a></div>
+      <div class="row"><button class="btn" id="readtips"><svg class="i"><use href="#i-volume"/></svg><span data-i18n>Read these aloud</span></button></div>
+    </div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="view" id="help">
+    <div class="card">
+      <h2 data-i18n>How to use this website</h2>
+      <p class="lead" data-i18n>Follow these simple steps. You can listen to them too.</p>
+      <ol class="guide" id="helplist"></ol>
+      <div class="row"><button class="btn" id="readhelp"><svg class="i"><use href="#i-volume"/></svg><span data-i18n>Read this aloud</span></button></div>
+    </div>
+  </section>
+</main>
+
+<footer data-i18n>Bank Sathi gives general help only. For big decisions, visit your bank branch.</footer>
+
+<div id="audiobar" hidden>
+  <button id="abpause" aria-label="Pause or play"></button>
+  <button id="abstop" class="stop" aria-label="Stop"></button>
+</div>
+<input id="audin" type="file" accept="audio/*" capture>
+
+<script src="/static/data.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
