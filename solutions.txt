@@ -1,0 +1,194 @@
+BANK SATHI (बैंक साथी) - SOLUTION OVERVIEW
+==========================================
+
+1. THE PROBLEM
+--------------
+Banking in India is still hard for two large groups of people:
+  - Elderly people, who find forms, apps, SMS alerts and bank language confusing.
+  - People who do not read English, but must deal with passbooks, loan forms, FD
+    receipts and pension papers that are printed in English.
+
+The result: people depend on others to read their papers, they sign forms they do
+not understand, and they are easy targets for SMS and phone fraud (fake KYC
+updates, lottery messages, "your account will be blocked").
+
+2. THE SOLUTION
+---------------
+Bank Sathi is a simple website that works on any phone or laptop. A person can
+show it a paper (camera photo or upload), ask a question in their own language
+by typing or speaking, and get the answer as text AND as audio, in simple words.
+
+The entry point is one sentence: the user presses the microphone on the home page
+and SAYS WHAT THEY WANT TO DO, in any language. Bank Sathi detects the language,
+switches the whole site to it, opens the right page and plays a short spoken
+explanation of what that page does. The user never has to find a menu or choose
+a language.
+
+It covers the whole journey, not just one question:
+  - Understand a paper        (Scan and Ask)
+  - Know what to do next      (Next Steps)
+  - Fill a form correctly     (Fill a Form)
+  - Spot a scam               (Check a Message)
+  - Find a government scheme  (Government Schemes)
+  - Learn banking words       (Banking Words)
+  - Stay safe                 (Stay Safe)
+  - Learn the site itself     (How to Use)
+
+It supports all 22 languages of the Indian Constitution. The screen always shows
+English first and the chosen language underneath, so a helper who reads English
+can follow along with the user.
+
+3. APPROACH
+-----------
+Design principles
+  1. Minimal and calm. Big buttons, big text, high contrast, one task per screen.
+  2. Voice first. Every answer is read aloud; every text box has a microphone.
+  3. Language first. All 22 languages scroll in the header in their own script.
+  4. Safe by design. The AI never decides whether a message is a scam; clear
+     rules do, and the AI only explains the result. Documents live only in
+     memory. The API key never leaves the server.
+  5. Honest about limits. Answers about schemes use only written facts, include
+     official website links, and tell the user to confirm at the bank.
+
+How a request flows
+  Browser  ->  Flask server (app.py)  ->  Sarvam AI APIs  ->  back to browser
+
+  - The browser (plain HTML, CSS, JavaScript) never talks to Sarvam directly, so
+    the API key stays secret on the server.
+  - Interface text is English in the code. The server translates it into the
+    chosen language when a page is opened and saves the result on disk, so each
+    sentence is translated only once per language for all users.
+  - A photo or PDF is turned into text once (Document Intelligence). That text
+    is kept in memory and sent to the chat model as context with each question.
+  - Answers come back in the user's language and are then converted to speech.
+
+Voice navigation approach (Home prompt)
+  Step 1: the browser records the speech and sends it to the server.
+  Step 2: Sarvam Speech to Text transcribes it with language detection switched on
+          (language_code="unknown"), so the reply contains both the words and the
+          language that was spoken. For typed text, Sarvam Language Identification
+          does the same job.
+  Step 3: the site switches to that language (interface text is translated on
+          demand and cached).
+  Step 4: the chat model picks the best page from a fixed list (scan, steps, form,
+          sms, schemes, words, safe, help or none). If the AI is unavailable,
+          simple keyword rules choose instead.
+  Step 5: the app opens that page and reads a short pre-written explanation of the
+          page aloud in the user's language. For Next Steps and Banking Words, what
+          the user said is also placed in that page's box, ready to send.
+
+Scam checking approach (Check a Message)
+  Step 1: transparent rules look for red flags: links, urgency words, requests
+          for OTP/PIN/CVV, prize or lottery claims, KYC-block threats, "call this
+          number" instructions, easy-loan offers, and senders that are ordinary
+          mobile numbers instead of a bank's official sender name.
+  Step 2: the rules give a verdict: SUSPICIOUS, LOOKS LIKE A NORMAL BANK MESSAGE,
+          or NOT SURE.
+  Step 3: the Sarvam chat model explains that verdict in the user's language and
+          lists next steps. It is told not to change the verdict, so it cannot
+          talk itself into calling a scam "safe". If the AI is unavailable, the
+          verdict, reasons and standard steps still appear.
+
+Form guidance approach (Fill a Form)
+  Each form is stored as a list of boxes: label, simple instruction, example.
+  The user is walked through one box at a time. "I do not understand this" asks
+  the chat model to explain that single box using only the facts for it. At the
+  end the user gets a clean answer sheet to copy onto the paper form or print.
+  Any other form can be photographed and discussed in a chat.
+
+4. SARVAM AI APIs USED
+----------------------
+All calls are made from the server using the official Python SDK (sarvamai).
+Base URL: https://api.sarvam.ai   Auth header: api-subscription-key
+
+  a) CHAT COMPLETIONS    model: sarvam-105b      endpoint: POST /v1/chat/completions
+     Used for: answering questions about a document, next-step plans, form-box
+     explanations, banking words, scheme questions, the plain-language
+     explanation of a scam verdict, and choosing which page a spoken request
+     belongs to (voice navigation). Always asked to reply ONLY in the user's
+     language, in short simple sentences, with no markdown. Thinking mode is
+     switched off for fast replies. Scheme and form answers get a fixed set of
+     facts and are told not to invent numbers.
+
+  b) TEXT TRANSLATION    model: sarvam-translate:v1   endpoint: POST /translate
+     Used for: translating the whole interface, tips, scheme details and form
+     instructions from English into the 22 languages. Runs in parallel with
+     retry on rate limits, results are cached.
+
+  c) DOCUMENT INTELLIGENCE (Sarvam Vision)   asynchronous job API
+     Used for: reading text from a photo or PDF of a passbook, form, FD, loan or
+     pension paper. Flow: create job -> upload file -> start -> wait -> download
+     markdown text. The text then becomes context for the chat.
+
+  d) TEXT TO SPEECH      model: bulbul:v3      endpoint: POST /text-to-speech
+     Used for: reading answers, tips, form boxes and the help page aloud. Long
+     text is split into chunks. 11 Indian languages plus English have their own
+     voice; the remaining languages are read with the Hindi voice.
+
+  e) SPEECH TO TEXT      model: saaras:v4      endpoint: POST /speech-to-text
+     Used for: the microphone buttons. The browser records a short clip, the
+     server sends it to Saaras and the words are placed in the text box so the
+     user can check them before sending. All 22 languages are supported.
+     On the Home prompt it is called with language_code="unknown", which makes
+     Saaras also return the detected language of the speaker.
+
+  f) LANGUAGE IDENTIFICATION                    endpoint: POST /text-lid
+     Used for: finding the language of text typed into the Home prompt, so the
+     site can switch to it just like it does for speech.
+
+Limits we respect (pay-as-you-go plan): about 60 requests per minute for chat,
+text to speech, speech to text and translation. The app retries on 429 and has
+its own per-visitor limit so a public link cannot drain the account.
+
+5. OTHER TECHNOLOGY
+-------------------
+  Backend      Python 3, Flask, python-dotenv
+  Frontend     HTML, CSS, JavaScript (no framework, no build step), inline SVG icons
+  Browser      MediaRecorder (microphone), Audio (playback), fetch, CSS variables
+  Security     API key only in .env on the server, HTTPS with an auto-generated
+               certificate (needed for the microphone), rate limit per visitor
+  Sharing      Cloudflare quick tunnel for a public link; same Wi-Fi works too
+  Design       Responsive (phone and laptop), light and dark mode, accessible
+               focus outlines, reduced-motion support, adjustable text size
+
+6. FEATURES
+-----------
+  - Voice prompt on Home: say or type what you want in any language; the app
+    detects the language, switches the site to it, opens the right page and plays
+    a short spoken explanation of that feature
+  - 22 languages, scrolling language header, English shown above every translation
+  - Scan and Ask: photo or file upload of any banking paper, ready-made sample
+    documents (images dropped into static/samples appear automatically), and
+    sample questions to tap
+  - Questions by typing or by voice; answers as text and audio with pause/stop,
+    and audio that stops when the user changes page
+  - Next Steps: describe a problem (typed, spoken or a tap-to-try example),
+    optionally add a photo, get a step plan and keep chatting
+  - Fill a Form: 4 guided forms with explanation, example, "use the example"
+    button and a printable answer sheet; plus upload any other form and chat
+  - Check a Message: scam / genuine / not-sure verdict with reasons, steps and
+    11 sample SMS (fake KYC, lottery, fake deposit, genuine bank alerts and more)
+  - 15 government schemes with facts, official website links and Q&A
+  - Banking words, fraud tips, and a complete how-to-use page
+  - Works on phone, tablet and laptop (no install), light/dark mode, bigger-text
+    buttons, large touch targets
+
+7. PRIVACY AND SAFETY
+---------------------
+  - Documents are read into memory only; never saved to disk.
+  - The API key is never sent to the browser or committed to git.
+  - The assistant never asks for, and warns about sharing, OTP, PIN and passwords.
+  - It gives no investment advice and sends big decisions to the bank branch.
+  - Scheme details were written from general knowledge, not copied from official
+    pages, so rates and rules must be confirmed on the linked official sites.
+
+8. LIMITATIONS AND NEXT STEPS
+-----------------------------
+  - Text to speech has no dedicated voice for 12 of the 22 languages yet.
+  - Scam rules are keyword based; new scam wording may need new rules.
+  - Language detection can be wrong for very short or mixed-language speech; the
+    user can always change the language from the list or the moving strip.
+  - Handwritten or blurry papers may not be read well.
+  - Ideas: reminders for FD maturity and life-certificate dates, nearby branch
+    and ATM finder, WhatsApp sharing of the summary to a family member, a
+    simple two-button mode for first-time users.

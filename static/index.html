@@ -57,6 +57,18 @@
   <!-- HOME -->
   <section class="view on" id="home">
     <p class="hello" data-i18n>Namaste! What do you need help with today?</p>
+    <div class="card voice">
+      <h2 data-i18n>Say what you want to do</h2>
+      <p class="lead" data-i18n>Press the microphone and speak in your language. I will take you to the right page and tell you how it works.</p>
+      <div class="field">
+        <input type="text" id="voiceq" data-i18n-ph placeholder="Or type what you want to do" aria-label="What do you want to do" autocomplete="off">
+        <button class="mic big" data-for="voiceq" data-auto="route" aria-label="Speak"></button>
+        <button class="btn" id="voicego"><svg class="i"><use href="#i-send"/></svg><span data-i18n>Go</span></button>
+      </div>
+      <div class="micstate" id="routestate" aria-live="polite"></div>
+      <p class="hint" data-i18n>Or tap an example:</p>
+      <div class="chips" id="voicechips"></div>
+    </div>
     <div class="tiles" id="tiles"></div>
   </section>
 
@@ -100,6 +112,8 @@
         <button class="mic" data-for="issue" aria-label="Speak"></button>
       </div>
       <div class="micstate"></div>
+      <p class="hint" data-i18n>Or tap an example:</p>
+      <div class="chips" id="issuechips"></div>
       <h3 class="label" data-i18n>2. Add a photo of your paper (optional)</h3>
       <div class="row">
         <label class="btn alt" for="cam2" tabindex="0" id="camlabel2"><svg class="i"><use href="#i-camera"/></svg><span data-i18n>Take a photo</span></label>

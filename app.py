@@ -272,7 +272,8 @@ def tts():
 
 
 FLAG_TEXT = {
-    "asks_secret": "It asks you to share or enter an OTP, PIN, CVV or password. A real bank never does this.",
+    "asks_secret": "It asks you to share or enter an OTP, PIN, CVV, password or your account or card details. A real bank never does this.",
+    "unverified_credit": "It says money was deposited, but it does not look like a real bank alert. Check your passbook or bank app. Scammers send fake deposit messages and then ask you to return the money.",
     "prize": "It promises a prize, lottery, cashback or free money.",
     "kyc_block": "It says your account or KYC will be blocked unless you act now.",
     "call_number": "It asks you to call an ordinary mobile number.",
@@ -288,7 +289,7 @@ def sms_flags(text, sender):
     t = text.lower()
     flags = []
     negated = re.search(r"(do not|don't|dont|never|not to)\s+(share|disclose|give|tell)", t)
-    if re.search(r"(send|share|give|tell|provide|reply|enter|submit|update|confirm)\W+(?:\w+\W+){0,4}(otp|pin|cvv|password|passcode)", t) and not negated:
+    if re.search(r"(send|share|give|tell|provide|reply|enter|submit|update|confirm)\W+(?:\w+\W+){0,4}(otp|pin|cvv|password|passcode|account (number|no)|bank details|card (number|details)|aadhaar)", t) and not negated:
         flags.append("asks_secret")
     if re.search(r"\b(won|winner|lottery|lucky draw|prize|jackpot|free gift|cashback|crore|kbc)\b", t):
         flags.append("prize")
@@ -303,19 +304,33 @@ def sms_flags(text, sender):
     if re.search(r"(pre-?approved|instant|easy).{0,30}loan|loan.{0,40}(no documents?|without documents?|0%)", t):
         flags.append("loan_offer")
     sender = (sender or "").strip()
-    if sender and not re.fullmatch(r"[A-Za-z]{2}-[A-Za-z0-9]{3,8}", sender):
+    official = bool(sender) and bool(re.fullmatch(r"[A-Za-z]{2}-[A-Za-z0-9]{3,8}", sender))
+    if sender and not official:
         flags.append("mobile_sender")
+    # a "money received" message with no official sender and none of the usual alert details (A/c XX1234, Avl Bal, Ref no.)
+    if (re.search(r"\b(dep\w*ited|deposit\w*|credited|received)\b", t) and not official
+            and not re.search(r"a/c|acct|avl|bal\b|\bref\b|\bxx\d+|\bupi\b|\*{2,}\d+", t)):
+        flags.append("unverified_credit")
     return flags
 
 
 def sms_verdict(text, flags):
-    if any(f in STRONG for f in flags) or len([f for f in flags if f not in ("mobile_sender",)]) >= 2:
+    if any(f in STRONG for f in flags) or len(flags) >= 2:
         return "suspicious"
     if flags:
         return "unsure"
     if re.search(r"\b(a/c|acct|account|debited|credited|avl|bal|upi|otp|statement|txn|transaction)\b", text.lower()):
         return "bank"
     return "unsure"
+
+
+GUIDE = {
+    "suspicious": "Say clearly that this looks like a scam.",
+    "bank": "Say it looks like a normal bank message. Do not call it a scam.",
+    "unsure": ("Do NOT say it is definitely fake and do NOT say it is definitely real. Say honestly that you cannot be sure from the text alone "
+               "and explain what looks odd. The steps must be about checking safely: open the bank app or look at the passbook or call the bank on the "
+               "number printed on the card, never use a number or link from the message, and never send or return any money to the sender."),
+}
 
 
 @app.post("/api/check-sms")
@@ -335,6 +350,7 @@ def check_sms():
         f"Sender: {data.get('sender') or 'unknown'}\n"
         f"Our checker's verdict (do not change it): {meaning}.\n"
         f"Red flags found: {'; '.join(FLAG_TEXT[f] for f in flags) or 'none'}.\n\n"
+        f"{GUIDE[verdict]}\n\n"
         f"Reply ONLY in {LANG_NAME.get(lang, 'Hindi')}, in very simple words. First write 1-2 short sentences saying what this message is and why. "
         "Then write 3 or 4 short numbered steps telling the user exactly what to do next "
         "(for a scam: do not click, do not call, do not share anything, block the sender, report at 1930 or cybercrime.gov.in, "
@@ -351,6 +367,52 @@ def check_sms():
     except Exception:
         answer = None  # the verdict and red flags still work without the AI explanation
     return jsonify(verdict=verdict, flags=[{"code": f, "text": FLAG_TEXT[f]} for f in flags], answer=answer)
+
+
+PAGES = {
+    "scan": "read or ask about a photo of a bank paper: passbook, fixed deposit, loan, pension or any document",
+    "steps": "describe a problem or situation and be told what to do next and what to carry to the bank",
+    "form": "get help to fill in a bank form such as account opening, loan application, deposit slip or life certificate",
+    "sms": "check whether an SMS or message received is a real bank message or a scam",
+    "schemes": "learn about government schemes for pension, insurance, savings, farmers, loans, health or girl child",
+    "words": "learn the meaning of a banking word such as nominee, KYC, EMI or interest",
+    "safe": "learn how to stay safe from fraud and scams",
+    "help": "learn how to use this website",
+}
+PAGE_WORDS = {
+    "sms": r"sms|message|msg|scam|fraud message|lottery|otp|spam|fake|संदेश|मैसेज|ठग|धोखा",
+    "form": r"\bform\b|fill|apply|application|फॉर्म|फार्म|भर",
+    "scan": r"scan|photo|picture|passbook|paper|document|read|पासबुक|फोटो|कागज|दस्तावेज",
+    "schemes": r"scheme|yojana|pension plan|insurance|subsid|government|योजना|सरकारी|बीमा",
+    "words": r"meaning|what is|what does|explain|word|मतलब|अर्थ|शब्द",
+    "safe": r"safe|security|protect|सुरक्षा|सुरक्षित",
+    "help": r"how to use|help me use|instruction|guide|कैसे उपयोग|कैसे इस्तेमाल",
+    "steps": r"problem|issue|not come|lost|stolen|blocked|what should i do|next step|समस्या|दिक्कत|परेशानी|खो",
+}
+
+
+@app.post("/api/route")
+def route_voice():
+    """Work out which page a spoken or typed request belongs to."""
+    data = request.get_json(force=True)
+    text = (data.get("text") or "").strip()[:500]
+    if not text:
+        return jsonify(error="Please say or type what you want to do."), 400
+    menu = "\n".join(f"{k}: {v}" for k, v in PAGES.items())
+    prompt = (f'A user of a banking helper website said (in any Indian language): "{text}"\n\n'
+              f"Pick the ONE page that best matches what they want:\n{menu}\nnone: nothing above matches\n\n"
+              "Reply with ONLY the page id (scan, steps, form, sms, schemes, words, safe, help or none), nothing else.")
+    tab = None
+    try:
+        r = client().chat.completions(model="sarvam-105b", messages=[{"role": "user", "content": prompt}],
+                                      temperature=0, max_tokens=20, reasoning_effort=None)
+        out = (r.choices[0].message.content or "").lower()
+        tab = next((k for k in [*PAGES, "none"] if re.search(rf"\b{k}\b", out)), None)
+    except Exception:
+        tab = None
+    if tab is None:   # AI unavailable or unclear: simple keyword rules
+        tab = next((k for k, pat in PAGE_WORDS.items() if re.search(pat, text.lower())), "none")
+    return jsonify(tab=tab)
 
 
 STT_LANGS = {"hi-IN", "bn-IN", "kn-IN", "ml-IN", "mr-IN", "od-IN", "pa-IN", "ta-IN", "te-IN", "en-IN", "gu-IN", "as-IN",
@@ -379,7 +441,21 @@ def stt():
     text = (r.transcript or "").strip()
     if not text:
         return jsonify(error="I could not hear anything. Please try again."), 422
-    return jsonify(text=text)
+    heard = r.language_code if r.language_code in STT_LANGS else None   # set when lang="auto"/"unknown"
+    return jsonify(text=text, lang=heard)
+
+
+@app.post("/api/detect-lang")
+def detect_lang():
+    """Which language is this typed text in? (used by the Home prompt to switch the page language)"""
+    text = (request.get_json(force=True).get("text") or "").strip()[:1000]
+    if len(text) < 3:
+        return jsonify(lang=None)
+    try:
+        code = client().text.identify_language(input=text).language_code
+    except Exception:
+        code = None
+    return jsonify(lang=code if code in STT_LANGS else None)
 
 
 def _chunk(text, size):

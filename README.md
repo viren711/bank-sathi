@@ -1,10 +1,37 @@
 # बैंक साथी · Bank Sathi
 
-A banking helper for **elderly people and people who do not know English**. Show it a passbook, a form or an SMS, ask a question in your own language (typed or spoken), and get a simple answer in text **and** audio. It works in all **22 languages of the Indian Constitution** and always shows the English text above the translation.
+### 🌐 Try it live: **<https://egg-easy-naturals-yeah.trycloudflare.com>**
+
+💻 Code: <https://github.com/viren711/bank-sathi>
+
+<sub>The live demo runs from a Cloudflare quick tunnel on the developer's machine, so the link changes if the tunnel restarts and it can be offline. To run your own copy, see [Setup and start the app](#setup-and-start-the-app).</sub>
+
+![Bank Sathi: just say what you want to do. It finds your language, opens the right page and explains it in your voice.](docs/screenshots/hero.png)
+
+## Just say what you want to do
+
+Open the home page, press the big microphone and **say what you need in your own language**, for example *"मुझे लोन का फॉर्म भरना है"* ("I want to fill a loan form"), *"I want to check an SMS I got"* or *"என் பென்ஷன் வரவில்லை"*. There is no menu to find and no language to choose.
+
+Bank Sathi **automatically detects the language you are speaking** (any of the 22 languages of the Indian Constitution, or English), switches the whole site to it, opens the right page and **plays a short spoken explanation** of what that page does and how to use it. If you type instead of speaking, the language is detected from your text too.
+
+It is built for **elderly people and people who do not know English**. Show it a passbook, a form or an SMS, ask your question by typing or speaking, and get a simple answer in text **and** audio, with the English text always shown above the translation so a family member can follow along. It is a website, so it works on **any device, a phone, tablet or laptop**, with nothing to install: see [Use it on any device](#use-it-on-any-device).
 
 Built on the [Sarvam AI](https://docs.sarvam.ai) APIs. Python (Flask) backend, plain HTML/CSS/JS front end, no build step.
 
-> Bank Sathi gives general help only. It is not financial advice. For big decisions, visit your bank branch with someone you trust.
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/1-home-laptop.png" alt="Home page on a laptop: the voice prompt, example phrases, the moving strip of 22 languages and the feature tiles" width="900">
+  <br><sub><b>Home</b>: say or type what you want, tap an example, or pick a feature. The strip on top scrolls through all 22 languages.</sub>
+</p>
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/screenshots/2-scan-and-ask-phone.png" alt="A sample passbook was read and the question 'what is my balance' was answered in Hindi" width="260"><br><sub><b>Scan and Ask</b><br>Read a passbook and get the answer in your language</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/3-check-message-phone.png" alt="A fake KYC SMS flagged as suspicious with the reasons in English and Hindi" width="260"><br><sub><b>Check a Message</b><br>Real bank message or scam, with reasons and next steps</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/4-fill-a-form-phone.png" alt="Guided loan form, step 3 of 15, with explanation, example, listen button and microphone" width="260"><br><sub><b>Fill a Form</b><br>One box at a time, explained in simple words</sub></td>
+  </tr>
+</table>
 
 ---
 
@@ -12,11 +39,11 @@ Built on the [Sarvam AI](https://docs.sarvam.ai) APIs. Python (Flask) backend, p
 
 | Page | What you can do |
 |---|---|
-| **Home** | Nine large icon buttons for everything below. |
+| **Home** | A **voice prompt** ("Say what you want to do"): speak or type your goal in any language, Bank Sathi **detects the language and switches the whole site to it**, opens the right page and plays a short spoken explanation of how it works. Below it, nine large icon buttons for everything else. |
 | **Scan and Ask** | Take a photo of (or upload) a passbook, FD, loan or pension paper, or tap a sample. Ask questions by typing or speaking. Answers appear in chat and are read aloud. |
 | **Next Steps** | Describe a problem (type or speak), optionally add a photo, and get a step-by-step plan with the papers to carry. Keep chatting to refine it. |
 | **Fill a Form** | A guided wizard for four forms (new account, loan, deposit slip, pension life certificate). One box at a time, with a plain explanation, an example, audio, and an "I do not understand" button. At the end you get a clean answer sheet to print. You can also upload any *other* form and chat about it. |
-| **Check a Message** | Paste an SMS (and optionally the sender). Get a verdict: **suspicious**, **looks like a normal bank message**, or **not sure**, with the reasons and the next steps. Nine sample messages included. |
+| **Check a Message** | Paste an SMS (and optionally the sender). Get a verdict: **suspicious**, **looks like a normal bank message**, or **not sure**, with the reasons and the next steps. Eleven sample messages included, such as fake KYC, lottery, fake deposit and genuine bank alerts. |
 | **Government Schemes** | 15 schemes (PM Jan Dhan, Atal Pension, PM Suraksha Bima, Sukanya Samriddhi, SCSS, PPF, PM Kisan, Mudra, Ayushman Bharat and more). Filter by category, open a scheme for the facts, official website links, and ask your own questions about it. |
 | **Banking Words** | Tap or type a word (nominee, KYC, EMI...) for a simple explanation with an example. |
 | **Stay Safe** | Short fraud-prevention rules, readable aloud, with a link to report cyber fraud. |
@@ -24,11 +51,47 @@ Built on the [Sarvam AI](https://docs.sarvam.ai) APIs. Python (Flask) backend, p
 
 Everywhere:
 
+- **Automatic language detection** on the Home prompt: speak or type in any language and the whole site switches to it.
 - **Revolving header** lists all 22 languages in their own script. Tap one to switch. Pause button included.
 - **Bilingual UI**: English first, your language underneath.
 - **Voice in and out**: microphone buttons (speech to text) and audio answers (text to speech) with Pause, Play and Stop. Audio stops when you change page.
 - **Large text**: `A-` / `A+` buttons.
 - **Light and dark mode**, works on phones, high contrast, big touch targets.
+
+---
+
+## Approach
+
+**Problem.** Elderly people and people who do not read English struggle with bank papers, forms and SMS alerts, and are easy targets for fraud.
+
+**Idea.** One simple website where a person shows a paper, asks in their own language by typing or speaking, and gets a short, simple answer as text and audio, then is guided to the next step.
+
+**Design principles**
+
+1. **Minimal and calm**: big buttons, big text, high contrast, one task per screen.
+2. **Voice first**: every answer is read aloud and every text box has a microphone.
+3. **Language first**: all 22 languages in the header; English always shown above the translation so a helper can follow.
+4. **Safe by design**: for scam checks, clear rules decide the verdict and the AI only explains it. Documents stay in memory. The API key stays on the server.
+5. **Honest about limits**: scheme and form answers use only written facts, link to official sites, and tell users to confirm at the bank.
+
+**Voice navigation.** The Home prompt records speech, Sarvam Speech to Text transcribes it and detects the language, the site switches to that language, the chat model picks the best page from a fixed list (keyword rules are the fallback), and a short pre-written explanation of that page is translated and read aloud.
+
+**Request flow.** The browser talks only to the Flask server. The server calls Sarvam, so the key is never exposed. Interface text is English in the code and is translated on demand, then cached on disk so every sentence is translated once per language. A photo is turned into text once and that text is sent to the chat model as context with each question. Answers are returned in the user's language and converted to speech.
+
+A longer write-up is in [solutions.txt](solutions.txt).
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| AI | Sarvam AI: Chat (`sarvam-105b`), Translate (`sarvam-translate:v1`), Document Intelligence, Text to Speech (`bulbul:v3`), Speech to Text (`saaras:v4`), Language Identification, via the `sarvamai` Python SDK |
+| Backend | Python 3.10+, Flask, python-dotenv |
+| Frontend | Plain HTML, CSS and JavaScript (no framework, no build step), inline SVG icons |
+| Browser features | `MediaRecorder` (microphone), `Audio` (playback), `fetch`, CSS variables, responsive grid |
+| Security | API key in `.env` on the server, HTTPS with an auto-generated certificate, per-visitor rate limit |
+| Sharing | Same Wi-Fi, or a Cloudflare quick tunnel for a public link |
 
 ---
 
@@ -40,7 +103,8 @@ Everywhere:
 | Interface text in 22 languages | Translate | `sarvam-translate:v1` |
 | Reading a photo/PDF of a document | Document Intelligence (Sarvam Vision) | async job, markdown output |
 | Reading answers aloud | Text to Speech | `bulbul:v3` |
-| Microphone input | Speech to Text | `saaras:v4` |
+| Microphone input, and detecting the spoken language | Speech to Text | `saaras:v4` (`language_code="unknown"` auto-detects) |
+| Detecting the language of typed text | Language Identification | `/text-lid` |
 
 **Voices:** Sarvam text to speech covers 11 of the 22 languages plus English (Bengali, Gujarati, Hindi, Kannada, Malayalam, Marathi, Odia, Punjabi, Tamil, Telugu). The other languages (Assamese, Bodo, Dogri, Kashmiri, Konkani, Maithili, Manipuri, Nepali, Sanskrit, Santali, Sindhi, Urdu) are read with the Hindi voice. Text answers are still in the chosen language.
 
@@ -48,34 +112,49 @@ See [api.txt](api.txt) for a summary of every Sarvam API.
 
 ---
 
-## Quick start
+## Setup and start the app
 
-You need **Python 3.10+** and a Sarvam API key from the [Sarvam dashboard](https://indus.sarvam.ai/key-management) (new verified accounts get free credits).
+**You need:** Python 3.10 or newer, and a Sarvam API key from the [Sarvam dashboard](https://indus.sarvam.ai/key-management) (new verified accounts get free credits). `openssl` must be installed for the HTTPS certificate (it is on Linux and macOS by default; on Windows it comes with Git for Windows).
+
+**1. Get the code**
 
 ```bash
-git clone https://github.com/<your-username>/bank-sathi.git
+git clone https://github.com/viren711/bank-sathi.git
 cd bank-sathi
-
-python3 -m venv .venv
-source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-cp .env.example .env                 # then open .env and paste your key
 ```
 
-`.env`:
+**2. Create a virtual environment and install**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate            # Windows (PowerShell): .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+**3. Add your API key**
+
+```bash
+cp .env.example .env                 # Windows: copy .env.example .env
+```
+
+Open `.env` and replace the placeholder:
 
 ```
 SARVAM_API_KEY=your_sarvam_api_key_here
 ```
 
-Run it:
+**4. Start the app**
 
 ```bash
-PORT=5057 python app.py
+PORT=5057 python app.py              # Windows (PowerShell): $env:PORT=5057; python app.py
 ```
 
-Open **https://localhost:5057**. The first time, your browser warns about the certificate (see [HTTPS and the microphone](#https-and-the-microphone)). Click *Advanced → Proceed*.
+**5. Open it**
+
+- On the same computer: **https://localhost:5057**
+- On a phone or another computer on the same Wi-Fi: **https://YOUR-COMPUTER-IP:5057** (see [Use it on any device](#use-it-on-any-device))
+
+The first time, the browser warns about the certificate because it is self-signed (see [HTTPS and the microphone](#https-and-the-microphone)). Click *Advanced → Proceed*. Stop the app with `Ctrl+C`.
 
 > If `python3 -m venv` fails on Debian/Ubuntu, run `sudo apt install python3-venv`, or create the venv with `python3 -m venv --without-pip .venv` and install with `pip --python .venv/bin/python install -r requirements.txt`.
 
@@ -91,7 +170,11 @@ Open **https://localhost:5057**. The first time, your browser warns about the ce
 
 ---
 
-## Use it on a phone (same Wi-Fi)
+## Use it on any device
+
+Bank Sathi is a normal website, so it runs on **any phone, tablet or laptop** with a modern browser (Chrome, Safari, Edge, Firefox) and needs no app install. The layout switches between a single column on phones and a wider grid on laptops.
+
+**Same Wi-Fi (phone, tablet or another laptop):**
 
 1. Start the app (it listens on all network interfaces).
 2. Find your computer's IP: `hostname -I` (Linux), `ipconfig getifaddr en0` (macOS), `ipconfig` (Windows).
@@ -173,6 +256,8 @@ Browser (static/)                      Flask (app.py)                      Sarva
 |---|---|
 | `GET /api/languages` | The 22 languages (code, English name, native name). |
 | `GET /api/samples` | Images in `static/samples/`. |
+| `POST /api/detect-lang` | `{text}` → `{lang}`: language of typed text (Sarvam language identification). |
+| `POST /api/route` | `{text, lang}` → `{tab}`: which page a spoken or typed request belongs to (AI with keyword fallback). |
 | `POST /api/translate` | `{lang, strings[]}` → translated strings (cached). |
 | `POST /api/upload` | Multipart `file` (jpg, png, pdf, max 10 MB) + `lang` → `{doc_id}`. |
 | `POST /api/chat` | `{question, lang, doc_id?, history?, context?}` → `{answer}`. |
@@ -228,7 +313,7 @@ Without the GitHub CLI: create an empty public repo on github.com, then
 
 ```bash
 git branch -M main
-git remote add origin https://github.com/<your-username>/bank-sathi.git
+git remote add origin https://github.com/viren711/bank-sathi.git
 git push -u origin main
 ```
 

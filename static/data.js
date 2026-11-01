@@ -11,7 +11,38 @@ const TIPS = [
 ];
 
 const WORDS = ["Nominee", "KYC", "Fixed Deposit", "Interest", "EMI", "Pension", "Passbook", "Cheque", "Overdraft", "Life certificate"];
-const DOC_QUESTIONS = ["What is this document?", "Explain this in simple words", "What is my balance or amount?"];
+const DOC_QUESTIONS = ["What is this document?", "Explain this in simple words", "What is my balance or amount?", "Who is the nominee?", "Are there any charges or deadlines?", "What should I do with this paper?"];
+
+// spoken introduction played when the voice prompt on Home opens a page
+const FEATURE_INTRO = {
+  scan: "This page reads your paper. Take a photo of your passbook, form or any bank paper, then ask me questions about it. I will answer and read the answer aloud.",
+  steps: "Tell me your problem, by typing or speaking. You can also add a photo of your paper. I will give you simple steps to follow and tell you what to carry to the bank.",
+  form: "This page helps you fill a form. Choose a form and I will ask you one box at a time and explain it in simple words. At the end you get a clean sheet to copy onto the paper form.",
+  sms: "Paste a message you received, and I will tell you if it looks like a real bank message or a scam, and what to do next.",
+  schemes: "Here you can read about government schemes for pension, insurance, savings and loans. Open any scheme to see who can join and how to apply, and ask your own questions.",
+  words: "If you do not understand a banking word, type it or tap it here, and I will explain it in simple words with an example.",
+  safe: "These are simple rules to protect your money from fraud. Never share your OTP or PIN with anyone.",
+  help: "This page explains how to use the website, step by step."
+};
+const NOT_UNDERSTOOD = "Sorry, I did not understand. Please say it again, or tap one of the big buttons.";
+const VOICE_SAMPLES = [
+  "I want to check an SMS I got",
+  "Help me fill a loan form",
+  "I want to read my passbook",
+  "Tell me about pension schemes",
+  "What does nominee mean?",
+  "My pension has not come"
+];
+
+// tap-to-try problems for the Next Steps page
+const ISSUE_SAMPLES = [
+  "My pension has not come this month.",
+  "I lost my ATM card.",
+  "I want to add my wife as nominee in my account.",
+  "My passbook is full. What should I do?",
+  "Someone called and asked for my OTP.",
+  "Money was cut from my account but I did not spend it."
+];
 
 const HOW_TO = [
   ["Choose your language", "Pick it from the list at the top, or tap a name in the moving strip. Every page changes to your language, with English kept above it."],
@@ -38,6 +69,8 @@ const SMS_SAMPLES = [
   { name: "Electricity cut", sender: "", text: "Your electricity will be disconnected tonight at 9:30 pm as your previous bill is not updated. Call officer 9123456780 immediately." },
   { name: "Refund trap", sender: "", text: "Refund of Rs 4,500 is pending for you. Enter your UPI PIN to receive the money in your account." },
   { name: "Easy loan", sender: "", text: "Pre-approved personal loan of Rs 5,00,000 at 0% interest. No documents needed. Click http://quick-cash.xyz/apply now, offer ends today!" },
+  { name: "Lottery voucher", sender: "", text: "you have won 50000 rupees, please send your account number to access the lottery voucher" },
+  { name: "Unclear deposit", sender: "", text: "you have depsited 10000 ruppees in account ending with 328597 in fiubwe branck" },
   { name: "Statement ready", sender: "VM-SMPLBK", text: "Your SAMPLE BANK statement for September is ready. Visit your branch or open the bank app to view it." }
 ];
 

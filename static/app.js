@@ -25,7 +25,7 @@ async function need(list) {
 }
 const COMMON = ["Listen", "Play", "Pause", "Stop", "Understanding your voice…", "Listening… press the red button when done.",
   "Microphone is blocked. Please allow it, or type instead.", "Reading your paper… please wait.", "Your paper is ready. Ask your question below.",
-  "Please add a photo of your paper first.", "Checking…", "Loading…", "Getting your form ready…"];
+  "Please add a photo of your paper first.", "Checking…", "Loading…", "Getting your form ready…", "Finding the right page…", "Language detected. Switching…"];
 // English first, the chosen language underneath it
 const bi = s => { const t = tr(s); return (S.lang === "en-IN" || t === s) ? esc(s) : `${esc(s)}<span class="loc">${esc(t)}</span>`; };
 const biText = s => { const t = tr(s); return (S.lang === "en-IN" || t === s) ? s : s + "\n" + t; };
@@ -164,13 +164,15 @@ function stopRecording() { if (rec && rec.state === "recording") rec.stop(); }
 
 async function transcribe(blob, name, btn) {
   micState(btn, bi("Understanding your voice…"));
-  const fd = new FormData(); fd.append("file", blob, name); fd.append("lang", S.lang);
+  const fd = new FormData(); fd.append("file", blob, name);
+  fd.append("lang", btn.dataset.auto === "route" ? "auto" : S.lang);   // the Home prompt lets Sarvam detect the spoken language
   try {
     const r = await fetch("/api/stt", { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "Error");
     const box = document.getElementById(btn.dataset.for);
     box.value = (box.value ? box.value + " " : "") + j.text; box.focus(); micState(btn, "");
+    if (btn.dataset.auto === "route") { await switchTo(j.lang); routeFrom(box.value); }
   } catch (err) { micState(btn, `<span class="notice">${esc(err.message)}</span>`); }
 }
 async function toggleMic(btn) {
@@ -194,6 +196,49 @@ async function toggleMic(btn) {
 document.addEventListener("click", e => { const b = e.target.closest(".mic"); if (b) toggleMic(b); });
 $("#audin").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f && recBtn) transcribe(f, f.name || "voice.m4a", recBtn); });
 $$(".mic").forEach(micIdle);
+
+// ---------------------------------------------------------------- voice prompt on Home: say what you want, open that page, hear how it works
+// Change the page language to the one that was spoken or typed
+async function switchTo(code) {
+  if (!code || code === S.lang || (code !== "en-IN" && !S.langs.some(l => l.code === code))) return;
+  const l = S.langs.find(x => x.code === code);
+  $("#routestate").innerHTML = `${esc(l ? l.native + " (" + l.name + ")" : "English")}: ${bi("Language detected. Switching…")}`;
+  await setLang(code);
+}
+async function routeFrom(text) {
+  text = text.trim(); if (!text) { $("#voiceq").focus(); return; }
+  const st = $("#routestate");
+  st.innerHTML = bi("Finding the right page…");
+  try {
+    const r = await post("/api/route", { text, lang: S.lang });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || "Error");
+    if (j.tab === "none" || !FEATURE_INTRO[j.tab]) {
+      await need([NOT_UNDERSTOOD]);
+      st.innerHTML = `<span class="notice">${bi(NOT_UNDERSTOOD)}</span>`; speak(tr(NOT_UNDERSTOOD)); return;
+    }
+    await need([FEATURE_INTRO[j.tab]]);
+    st.innerHTML = "";
+    $("#voiceq").value = "";
+    await go(j.tab);
+    if (j.tab === "steps") $("#issue").value = text;         // carry what they said into the page that needs it
+    if (j.tab === "words") $("#wordq").value = text;
+    speak(tr(FEATURE_INTRO[j.tab]));                          // short spoken introduction of the page
+  } catch (err) { st.innerHTML = `<span class="notice">${esc(err.message)}</span>`; }
+}
+RENDER.home = async () => {
+  await need(VOICE_SAMPLES);
+  $("#voicechips").innerHTML = VOICE_SAMPLES.map((q, i) => `<button class="chip" data-voice="${i}">${bi(q)}</button>`).join("");
+};
+$("#voicechips").addEventListener("click", e => { const c = e.target.closest("[data-voice]"); if (c) routeFrom(VOICE_SAMPLES[+c.dataset.voice]); });
+$("#voicego").onclick = async () => {
+  const v = $("#voiceq").value.trim();
+  if (v.length >= 3) {                                          // typed text: detect its language too
+    try { await switchTo((await (await post("/api/detect-lang", { text: v })).json()).lang); } catch (_) { /* keep the current language */ }
+  }
+  routeFrom(v);
+};
+$("#voiceq").addEventListener("keydown", e => { if (e.key === "Enter") $("#voicego").click(); });
 
 // ---------------------------------------------------------------- chat
 function addMsg(box, role, text) {
@@ -273,6 +318,14 @@ $("#issuego").onclick = () => {
   ask(v, $("#chat2"), { payload });
 };
 $("#issue").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#issuego").click(); } });
+RENDER.steps = async () => {
+  await need(ISSUE_SAMPLES);
+  $("#issuechips").innerHTML = ISSUE_SAMPLES.map((q, i) => `<button class="chip" data-issue="${i}">${bi(q)}</button>`).join("");
+};
+$("#issuechips").addEventListener("click", e => {
+  const c = e.target.closest("[data-issue]"); if (!c) return;
+  $("#issue").value = ISSUE_SAMPLES[+c.dataset.issue]; $("#issuego").click();   // the example is sent in English; the answer comes back in your language
+});
 $$("[data-ask]").forEach(b => b.onclick = () => {
   if (!S.docId) { alert(biText("Please add a photo of your paper first.")); return; }
   ask(b.dataset.ask, $("#chat2"));
@@ -309,7 +362,7 @@ async function renderStep() {
   const f = F.form, n = f.fields.length;
   if (F.i >= n) return renderSummary();
   const [label, help, eg] = f.fields[F.i];
-  await need(["Step", "I do not understand this", "See a sample of this form", "All forms", "Example", "Your answer", "Back", "Next", "Finish"]);
+  await need(["Step", "I do not understand this", "Use the example", "See a sample of this form", "All forms", "Example", "Your answer", "Back", "Next", "Finish"]);
   $("#formbody").innerHTML = `
     <button class="btn ghost small" id="fall">${ic("back")}<span>${bi("All forms")}</span></button>
     <h3 style="margin-top:14px">${bi(f.title)}</h3>
@@ -318,14 +371,15 @@ async function renderStep() {
     <div class="stepbox">
       <div class="q">${bi(label)}</div>
       <p>${bi(help)}</p>
-      <div class="eg"><b>${bi("Example")}:</b> ${esc(eg)}</div>
+      <div class="eg"><b>${bi("Example")}</b><div>${esc(eg)}</div></div>
       <div class="row">
         <button class="btn small ghost" id="flisten">${ic("volume")}<span>${bi("Listen")}</span></button>
         <button class="btn small ghost" id="fexplain">${ic("help")}<span>${bi("I do not understand this")}</span></button>
+        <button class="btn small ghost" id="fuse">${ic("check")}<span>${bi("Use the example")}</span></button>
       </div>
       <div class="chat" id="fchat"></div>
       <label class="label" for="fans">${bi("Your answer")}</label>
-      <div class="field"><input type="text" id="fans" value="${esc(F.answers[F.i])}" autocomplete="off"><button class="mic" data-for="fans" aria-label="Speak"></button></div>
+      <div class="field inline"><input type="text" id="fans" value="${esc(F.answers[F.i])}" autocomplete="off"><button class="mic" data-for="fans" aria-label="Speak"></button></div>
       <div class="micstate"></div>
       <div class="row">
         <button class="btn ghost" id="fback" ${F.i === 0 ? "disabled" : ""}>${ic("back")}<span>${bi("Back")}</span></button>
@@ -338,6 +392,7 @@ async function renderStep() {
   $("#flisten").onclick = e => speak(`${tr(label)}. ${tr(help)}`, e.currentTarget);
   $("#fexplain").onclick = () => ask("Explain this box in more detail, with an easy example, for someone who has never filled a bank form.", $("#fchat"),
     { useDoc: false, context: `Form: ${f.title}. Box: ${label}. Instruction: ${help}. Example answer: ${eg}` });
+  $("#fuse").onclick = () => { $("#fans").value = eg; $("#fans").focus(); };
   const keep = () => { F.answers[F.i] = $("#fans").value.trim(); };
   $("#fback").onclick = () => { keep(); F.i--; renderStep(); };
   $("#fnext").onclick = () => { keep(); F.i++; renderStep(); };
